@@ -4,21 +4,17 @@ import android.os.Build
 import android.text.Editable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import android.text.TextPaint
-import android.text.style.ClickableSpan
-import android.view.View
 import android.widget.EditText
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModel
 import android.util.Base64
-import androidx.lifecycle.ViewModelProvider
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.text.DecimalFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.reflect.full.memberProperties
 
 /**
  * Extension method to cast a char with a decimal value to an [Int].
@@ -164,3 +160,16 @@ fun Bitmap.saveFile(path: String) {
  * Extension method to get the TAG name for all object
  */
 fun <T : Any> T.TAG() = this::class.simpleName
+
+/**
+ * This extension function uses reflection, data class object to map
+ * this function not work when in gradle minifyEnabled is true !!!!!!!!
+ */
+inline fun <reified T : Any> T.asMap() : Map<String, Any?> {
+    val props = T::class.memberProperties.associateBy { it.name }
+    return props.keys.associateWith { props[it]?.get(this) }
+}
+
+fun Double.formatTwoDecimal(): String {
+    return DecimalFormat("#.##").format(this)
+}

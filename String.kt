@@ -1,3 +1,4 @@
+import androidx.core.text.HtmlCompat
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.text.ParseException
@@ -21,9 +22,10 @@ fun String.sha1() = encrypt(this, "SHA-1")
 
 /**
  * Extension method to check if String is Phone Number.
+ * example: 999-999-9999, 9999999999, (999) 999-9999
  */
 fun String.isPhone(): Boolean {
-    val p = "^1([34578])\\d{9}\$".toRegex()
+    val p = "^(\\d{10})|(([\\(]?([0-9]{3})[\\)]?)?[ \\.\\-]?([0-9]{3})[ \\.\\-]([0-9]{4}))\$".toRegex()
     return matches(p)
 }
 
@@ -43,6 +45,14 @@ fun String.isNumeric(): Boolean {
     return matches(p)
 }
 
+/**
+ * Extension method to check if String is Number.
+ */
+fun String.isNumericDecimal(): Boolean {
+    val p = "-?\\d+(\\.\\d+)?".toRegex()
+    return matches(p)
+}
+
 fun String.isIdcard(): Boolean {
     val p18 =
         "^[1-9]\\d{5}(18|19|([23]\\d))\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]\$".toRegex()
@@ -50,6 +60,8 @@ fun String.isIdcard(): Boolean {
         "^[1-9]\\d{5}\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{2}[0-9Xx]\$".toRegex()
     return matches(p18) || matches(p15)
 }
+
+fun String.fromHtml() = HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
 /**
  * Extension method to check String equalsIgnoreCase
@@ -75,6 +87,16 @@ private fun encrypt(string: String?, type: String): String {
 }
 
 /**
+ * Pre-Concatenate two strings or return empty
+ */
+
+fun String.preConcatOrEmpty(prefix: String?): String {
+    return if (this.isEmpty())
+        ""
+    else "${prefix?: ""}$this"
+}
+
+/**
  * Extension method to convert byteArray to String.
  */
 private fun bytes2Hex(bts: ByteArray): String {
@@ -93,12 +115,13 @@ private fun bytes2Hex(bts: ByteArray): String {
 /**
  * String date formatted
  */
-private enum class DateFormat(val pattern: String) {
+enum class DateFormat(val pattern: String) {
     YEAR_MONTH_DAY("yyyy-MM-dd"),
-    DAY_MONTH_YEAR("dd-MM-yyyy")
+    DAY_MONTH_YEAR("dd-MMMM-yyyy"),
+    ISO_LOCAL_DATE_TIME("yyyy-MM-dd'T'HH:mm:ss")
 }
 
-fun String.toFortmatDate(
+fun String.toFormatDate(
     patternOrigin: String = DateFormat.YEAR_MONTH_DAY.pattern,
     patternFinal: String = DateFormat.DAY_MONTH_YEAR.pattern
 ): String {

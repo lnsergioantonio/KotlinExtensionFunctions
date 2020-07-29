@@ -3,9 +3,17 @@ import android.graphics.Typeface
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.util.Log
+import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 
+private fun TextView.goneIfTextEmpty() {
+    visibility = if (text.isNullOrEmpty()) {
+        View.GONE
+    } else {
+        View.VISIBLE
+    }
+}
 /**
  * Extension method underLine for TextView.
  */

@@ -1,12 +1,13 @@
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
 /**
  * Extension method to inflate layout for ViewGroup.
  */
-/*fun ViewGroup.inflate(layoutRes: Int): View {
-    return LayoutInflater.from(context).inflate(layoutRes, this, false)
-}*/
+fun ViewGroup.layoutInflater(): LayoutInflater {
+    return LayoutInflater.from(context)
+}
 
 fun ViewGroup.inflate(layoutId:Int): View {
     //LayoutInflater.from(context).inflate(layout,this,false)

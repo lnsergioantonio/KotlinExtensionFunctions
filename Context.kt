@@ -3,14 +3,21 @@ import android.app.Notification
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.location.LocationManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.NetworkInfo
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.*
+import androidx.annotation.IntRange
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+
 
 /**
  * Extension method to show notification for Context.
@@ -105,5 +112,39 @@ fun Context.getDrawable(@DrawableRes id: Int) = ContextCompat.getDrawable(this, 
 /**
  * InflateLayout
  */
-fun Context.inflateLayout(@LayoutRes layoutId: Int, parent: ViewGroup? = null, attachToRoot: Boolean = false): View
+fun Context?.inflateLayout(@LayoutRes layoutId: Int, parent: ViewGroup? = null, attachToRoot: Boolean = false): View
         = LayoutInflater.from(this).inflate(layoutId, parent, attachToRoot)
+
+/**
+ * GPS/Network Location enabled
+ */
+fun Context?.isLocationEnabled(): Boolean =
+    this?.run {
+        val locationManager = (getSystemService(Context.LOCATION_SERVICE) as LocationManager)
+        locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }?:false
+
+
+/**
+ * Is network connected
+ */
+fun Context?.isNetworkConnected(): Boolean {
+    var isConnected = false
+    this?.let {
+        val connectivityManager = (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            connectivityManager?.run {
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)?.run {
+                    isConnected = hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                }
+            }
+        } else {
+            connectivityManager?.run {
+                connectivityManager.activeNetworkInfo?.run {
+                    isConnected = (type == ConnectivityManager.TYPE_WIFI) || (type == ConnectivityManager.TYPE_MOBILE)
+                }
+            }
+        }
+    }
+    return isConnected
+}

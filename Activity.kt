@@ -52,6 +52,20 @@ inline fun <reified T : Any> Context.launchActivity (
 inline fun <reified T : Any> newIntent(context: Context): Intent = Intent(context, T::class.java)
 
 /**
+ * Finish activity for result
+ */
+fun Activity.finishActivityForResult (
+    resultCode: Int = RESULT_OK,
+    init: Intent.() -> Unit = {}
+) {
+    val intent = Intent()
+    intent.init()
+
+    setResult(resultCode, intent)
+    finish()
+}
+
+/**
  * Extension method to provide hide keyboard for [Activity].
  */
 fun Activity.hideSoftKeyboard() {

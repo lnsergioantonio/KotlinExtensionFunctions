@@ -4,6 +4,7 @@ import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.View
+import android.widget.SearchView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 
@@ -64,4 +65,18 @@ fun TextView.font(font: String) {
  */
 fun TextView.setDrawableLeft(drawable: Int) {
     this.setCompoundDrawablesWithIntrinsicBounds(drawable, 0, 0, 0)
+}
+
+inline fun SearchView.onQueryTextChanged(crossinline onQueryTextChanged:(String)->Unit){
+    setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+        override fun onQueryTextSubmit(query: String): Boolean {
+            onQueryTextChanged(query)
+            return false
+        }
+
+        override fun onQueryTextChange(newText: String): Boolean {
+            return false
+        }
+
+    })
 }
